@@ -47,6 +47,8 @@
 
 ## 构建
 
+GitHub 自动构建、正式签名及 Release 草稿流程见 [Release 构建与分发](docs/RELEASE.md)。Release 构建不会解决未 Root 设备的触屏权限问题；重启后免电脑恢复触屏尚未实现。
+
 Windows PowerShell + 原生 Java / Android UI，无第三方 UI 框架。自行准备：
 
 - JDK，开发环境为 JDK 21，编译目标 Java 8。

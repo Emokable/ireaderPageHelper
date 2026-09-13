@@ -1,0 +1,59 @@
+name: Signed Release draft
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: windows-2022
+    timeout-minutes: 20
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Android SDK packages
+        shell: pwsh
+        run: |
+          & "$env:ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager.bat" "platforms;android-34" "build-tools;34.0.0"
+          if ($LASTEXITCODE -ne 0) { throw 'SDK installation failed' }
+      - name: Build signed Release and test
+        shell: pwsh
+        env:
+          KEYSTORE_BASE64: ${{ secrets.PAGEH_KEYSTORE_BASE64 }}
+          PAGEH_KEY_ALIAS: ${{ secrets.PAGEH_KEY_ALIAS }}
+          PAGEH_STORE_PASSWORD: ${{ secrets.PAGEH_STORE_PASSWORD }}
+          PAGEH_KEY_PASSWORD: ${{ secrets.PAGEH_KEY_PASSWORD }}
+        run: |
+          if (!$env:KEYSTORE_BASE64) { throw 'Configure release signing secrets first.' }
+          $env:PAGEH_KEYSTORE = Join-Path $env:RUNNER_TEMP 'pageh-release.keystore'
+          try {
+            [IO.File]::WriteAllBytes($env:PAGEH_KEYSTORE, [Convert]::FromBase64String($env:KEYSTORE_BASE64))
+            ./build.ps1 -BuildType Release
+            if ($LASTEXITCODE -ne 0) { throw 'Release build failed' }
+          } finally {
+            if (Test-Path -LiteralPath $env:PAGEH_KEYSTORE) { Remove-Item -LiteralPath $env:PAGEH_KEYSTORE -Force }
+          }
+      - name: Create draft only
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          $manifest = New-Object System.Xml.XmlDocument
+          $manifest.Load((Join-Path $PWD 'app/src/main/AndroidManifest.xml'))
+          $version = $manifest.DocumentElement.GetAttribute('versionName', 'http://schemas.android.com/apk/res/android')
+          if ($version -notmatch '^\d+\.\d+\.\d+(?:-[a-zA-Z0-9.-]+)?$') { throw 'Invalid version' }
+          $apk = "dist/pageh-helper-$version-release.apk"
+          $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $apk).Hash.ToLowerInvariant()
+          $notes = "Experimental build. Read README limitations before installation. Reboot-safe, computer-free touch animation on non-root devices is NOT implemented. GPL-3.0-only. SHA256: $hash"
+          gh release create "v$version" $apk --target $env:RELEASE_COMMIT --draft --prerelease --title "v$version experimental" --notes $notes
+          if ($LASTEXITCODE -ne 0) { throw 'Draft creation failed; existing releases will not be overwritten.' }
