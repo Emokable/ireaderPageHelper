@@ -1,0 +1,33 @@
+/tools/
+/build/
+/dist/
+/*.zip
+/*.jar
+/*.so
+/android-repository.xml
+/surfaceflinger
+/sfcmd
+/probe/*.class
+/probe/*.dex
+# Vendor reference source and local experiments, not app distribution.
+/EPDCDevice.java
+/probe/
+# Local historical research, superseded by README.
+/实施方案.md
+/多看横滑兼容测试.md
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+*.apk
+*.dex
+*.class
+*.log
+*.mmkv
+.env
+.env.*
+!.env.example
+/local.properties
+/.idea/
+/.vscode/

@@ -1,0 +1,17 @@
+掌阅水波纹助手 / ireaderPageHelper
+Copyright (C) 2026 nuku
+Contact: krisia@foxmail.com
+Source: https://github.com/Emokable/ireaderPageHelper
+
+SPDX-License-Identifier: GPL-3.0-only
+本项目原创代码、文档和矢量图形采用 GNU General Public License
+version 3 only。完整条款见 LICENSE；软件不附带任何担保。
+
+水波纹 API 来自掌阅（iReader）系统，包括 android.eink.EPDCDevice、
+next-effect-type 和 epdc-force-next-post-mode。底层显示实现并非本项目原创。
+本项目是独立的第三方工具，与掌阅不存在官方隶属或背书关系。
+厂商系统实现及第三方商标不因本项目许可而获得再授权。
+
+仓库不包含厂商固件、反编译系统实现、第三方阅读器 APK、Android SDK、
+构建工具、签名密钥、设备日志或书页截图。构建工具需使用者自行准备，
+并遵守各自许可证。本项目仅通过设备已有的接口调用系统功能。
