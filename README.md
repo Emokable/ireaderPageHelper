@@ -1,6 +1,6 @@
 # 掌阅水波纹助手
 
-为掌阅 E-Ink 阅读设备尝试接入系统 PAGE_H 水波纹。作者：**nuku** · **krisia@foxmail.com**。
+为掌阅 E-Ink 阅读设备尝试接入系统 PAGE_H 水波纹。
 
 版本 **0.3.1**，实验性调试版。实测设备为 Ocean 5 Pro / Android 14，不保证其他固件或设备兼容。
 
